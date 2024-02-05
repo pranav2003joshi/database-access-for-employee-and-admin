@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureDataFrame App</title>
+
+    <style>
+        body {
+            background-color: #333;
+            color: #fff;
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            font-size: 2em;
+            margin: 20px;
+        }
+
+        .form-container {
+            margin: 20px;
+        }
+
+        .form-container:not(:last-child)::after {
+            content: "";
+            display: block;
+            margin: 20px auto;
+            width: 80%;
+            height: 1px;
+            background-color: #555;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        input {
+            padding: 10px;
+            margin-bottom: 15px;
+            width: 200px;
+            font-size: 1em;
+        }
+
+        button {
+            padding: 15px;
+            font-size: 1.2em;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #output {
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <h1>SecureDataFrame App</h1>
+
+    <div class="form-container">
+        <h2>Create Initial Data</h2>
+        <form id="createForm" method="post">
+            <label for="access_key">Enter access key:</label>
+            <input type="text" id="access_key" name="access_key" required>
+            <label for="index">Enter initial index:</label>
+            <input type="number" id="index" name="index" required>
+            <label for="value">Enter initial value:</label>
+            <input type="text" id="value" name="value" required>
+            <button type="submit">Create Initial Data</button>
+        </form>
+    </div>
+
+    <div class="form-container">
+        <h2>Read DataFrame</h2>
+        <form id="readForm">
+            <label for="access_key">Enter access key:</label>
+            <input type="text" id="access_key" name="access_key" required>
+            <button type="button" onclick="readDataFrame()">Read DataFrame</button>
+        </form>
+    </div>
+    
+    <div class="form-container">
+        <h2>Modify DataFrame</h2>
+        <form id="modifyForm">
+            <label for="access_key_modify">Enter access key:</label>
+            <input type="text" id="access_key_modify" name="access_key_modify" required>
+            <label for="index">Enter index to modify:</label>
+            <input type="number" id="index" name="index" required>
+            <label for="value">Enter new value:</label>
+            <input type="text" id="value" name="value" required>
+            <button type="button" onclick="modifyDataFrame()">Modify DataFrame</button>
+        </form>
+    </div>
+    
+    <div class="form-container">
+        <h2>Delete Row</h2>
+        <form id="deleteForm">
+            <label for="access_key_delete">Enter access key:</label>
+            <input type="text" id="access_key_delete" name="access_key_delete" required>
+            <label for="index_delete">Enter index to delete:</label>
+            <input type="number" id="index_delete" name="index_delete" required>
+            <button type="button" onclick="deleteRow()">Delete Row</button>
+        </form>
+    </div>
+    
+    <div id="output"></div>
+
+    <script>
+        function readDataFrame() {
+            const accessKey = document.getElementById('access_key').value;
+            fetch('/read_dataframe', {
+                method: 'POST',
+                body: new URLSearchParams({ access_key: accessKey }),
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('output').innerHTML = JSON.stringify(data.data);
+                } else {
+                    document.getElementById('output').innerHTML = 'Error: ' + data.error;
+                }
+            });
+        }
+
+        function modifyDataFrame() {
+            const accessKey = document.getElementById('access_key_modify').value;
+            const index = document.getElementById('index').value;
+            const value = document.getElementById('value').value;
+            fetch('/modify_dataframe', {
+                method: 'POST',
+                body: new URLSearchParams({ access_key: accessKey, index: index, value: value }),
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('output').innerHTML = JSON.stringify(data.data);
+                } else {
+                    document.getElementById('output').innerHTML = 'Error: ' + data.error;
+                }
+            });
+        }
+
+        function deleteRow() {
+            const accessKey = document.getElementById('access_key_delete').value;
+            const index = document.getElementById('index_delete').value;
+            fetch('/delete_row', {
+                method: 'POST',
+                body: new URLSearchParams({ access_key: accessKey, index: index }),
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('output').innerHTML = JSON.stringify(data.data);
+                } else {
+                    document.getElementById('output').innerHTML = 'Error: ' + data.error;
+                }
+            });
+        }
+    </script>
+</body>
+</html>
